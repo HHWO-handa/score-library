@@ -633,6 +633,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -851,45 +852,70 @@ document.getElementById('btn-generate').addEventListener('click', openModal);
 document.getElementById('btn-close-modal').addEventListener('click', closeModal);
 document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
 
-// ─── Download ───
+// ─── Download（パートごと個別PDF → ZIPまとめ）───
 document.getElementById('btn-download').addEventListener('click', async () => {
   const partMap = buildPartMap();
-  const tasks = [];
+
+  // 選択パートを収集: { partName, items:[{score,file}] }[]
+  const selectedParts = [];
   document.querySelectorAll('#modal-parts-grid .part-check-label.checked').forEach(lbl => {
     const pn = lbl.dataset.part;
-    if (partMap.has(pn)) partMap.get(pn).forEach(item => tasks.push({ ...item, partName: pn }));
+    if (partMap.has(pn)) selectedParts.push({ partName: pn, items: partMap.get(pn) });
   });
-  if (tasks.length === 0) { showToast('パートが選択されていません', 'error'); return; }
+  if (selectedParts.length === 0) { showToast('パートが選択されていません', 'error'); return; }
 
   document.getElementById('btn-download').disabled = true;
   document.getElementById('progress-wrap').style.display = 'block';
 
   try {
     const { PDFDocument } = PDFLib;
-    const merged = await PDFDocument.create();
-    for (let i = 0; i < tasks.length; i++) {
-      const t = tasks[i];
-      document.getElementById('modal-info-text').textContent = `処理中: ${t.score.title} — ${t.partName} (${i+1}/${tasks.length})`;
-      document.getElementById('progress-bar').style.width = `${((i+1)/tasks.length)*100}%`;
-      try {
-        const bytes = await fetch(t.file).then(r => r.arrayBuffer());
-        const src = await PDFDocument.load(bytes);
-        const pages = await merged.copyPages(src, src.getPageIndices());
-        pages.forEach(p => merged.addPage(p));
-      } catch { showToast(`読み込み失敗: ${t.partName}`, 'error'); }
+    const zip = new JSZip();
+    const total = selectedParts.length;
+
+    for (let i = 0; i < total; i++) {
+      const { partName, items } = selectedParts[i];
+      document.getElementById('modal-info-text').textContent =
+        `処理中: ${partName} (${i + 1} / ${total})`;
+      document.getElementById('progress-bar').style.width = `${((i + 1) / total) * 100}%`;
+
+      // パート1つにつき1つのPDFを生成（複数曲あればページを結合）
+      const partPdf = await PDFDocument.create();
+      for (const { score, file } of items) {
+        try {
+          const bytes = await fetch(file).then(r => r.arrayBuffer());
+          const src = await PDFDocument.load(bytes);
+          const pages = await partPdf.copyPages(src, src.getPageIndices());
+          pages.forEach(p => partPdf.addPage(p));
+        } catch {
+          showToast(`読み込み失敗: ${score.title} — ${partName}`, 'error');
+        }
+      }
+
+      const pdfBytes = await partPdf.save();
+
+      // ファイル名: パート名をそのまま使用（記号を安全な文字に変換）
+      const safeName = partName.replace(/[\\/:*?"<>|]/g, '_');
+      zip.file(`${safeName}.pdf`, pdfBytes);
     }
-    const pdfBytes = await merged.save();
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
+
+    document.getElementById('modal-info-text').textContent = 'ZIPファイルを生成中...';
+    document.getElementById('progress-bar').style.width = '100%';
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
     const a = document.createElement('a');
     a.href = url;
-    const nums = [...new Set(queue.map(q => q.score.number))].join('_');
-    a.download = `parts_${nums}_${new Date().toISOString().slice(0,10)}.pdf`;
+    a.download = `score_${new Date().toISOString().slice(0, 10)}.zip`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('ダウンロードを開始しました', 'success');
+
+    showToast('ZIPダウンロードを開始しました', 'success');
     closeModal();
-  } catch(e) { showToast('PDF生成中にエラーが発生しました', 'error'); console.error(e); }
+  } catch(e) {
+    showToast('ZIP生成中にエラーが発生しました', 'error');
+    console.error(e);
+  }
+
   document.getElementById('btn-download').disabled = false;
   document.getElementById('progress-wrap').style.display = 'none';
 });
