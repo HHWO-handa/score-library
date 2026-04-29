@@ -11,6 +11,7 @@
     "notes": "",
     "fullScore": "scores/023_SHALALA/Full.pdf",
     "parts": [
+      { "name": "Score", "file": "scores/023_SHALALA/Full.pdf" },
       { "name": "Flute", "file": "scores/023_SHALALA/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/023_SHALALA/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/023_SHALALA/ASax.pdf" },
@@ -35,6 +36,7 @@
     "notes": "",
     "fullScore": "scores/033_中日チャンステーマ２/Full.pdf",
     "parts": [
+      { "name": "Score", "file": "scores/033_中日チャンステーマ２/Full.pdf" },
       { "name": "Flute", "file": "scores/033_中日チャンステーマ２/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/033_中日チャンステーマ２/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/033_中日チャンステーマ２/ASax.pdf" },
@@ -59,6 +61,7 @@
     "notes": "",
     "fullScore": "scores/045_ファンファーレ（天理高校）/Full.pdf",
     "parts": [
+      { "name": "Score", "file": "scores/045_ファンファーレ（天理高校）/Full.pdf" },
       { "name": "Flute", "file": "scores/045_ファンファーレ（天理高校）/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/045_ファンファーレ（天理高校）/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/045_ファンファーレ（天理高校）/ASax.pdf" },
@@ -83,6 +86,7 @@
     "notes": "",
     "fullScore": "scores/056_ルパン三世のテーマ/Full.pdf",
     "parts": [
+      { "name": "Score", "file": "scores/056_ルパン三世のテーマ/Full.pdf" },
       { "name": "Flute", "file": "scores/056_ルパン三世のテーマ/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/056_ルパン三世のテーマ/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/056_ルパン三世のテーマ/ASax.pdf" },
