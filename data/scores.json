@@ -11,7 +11,6 @@
     "notes": "",
     "fullScore": "scores/023_SHALALA/Full.pdf",
     "parts": [
-      { "name": "Score", "file": "scores/023_SHALALA/Full.pdf" },
       { "name": "Flute", "file": "scores/023_SHALALA/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/023_SHALALA/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/023_SHALALA/ASax.pdf" },
@@ -36,7 +35,6 @@
     "notes": "",
     "fullScore": "scores/033_中日チャンステーマ２/Full.pdf",
     "parts": [
-      { "name": "Score", "file": "scores/033_中日チャンステーマ２/Full.pdf" },
       { "name": "Flute", "file": "scores/033_中日チャンステーマ２/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/033_中日チャンステーマ２/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/033_中日チャンステーマ２/ASax.pdf" },
@@ -61,7 +59,6 @@
     "notes": "",
     "fullScore": "scores/045_ファンファーレ（天理高校）/Full.pdf",
     "parts": [
-      { "name": "Score", "file": "scores/045_ファンファーレ（天理高校）/Full.pdf" },
       { "name": "Flute", "file": "scores/045_ファンファーレ（天理高校）/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/045_ファンファーレ（天理高校）/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/045_ファンファーレ（天理高校）/ASax.pdf" },
@@ -86,7 +83,6 @@
     "notes": "",
     "fullScore": "scores/056_ルパン三世のテーマ/Full.pdf",
     "parts": [
-      { "name": "Score", "file": "scores/056_ルパン三世のテーマ/Full.pdf" },
       { "name": "Flute", "file": "scores/056_ルパン三世のテーマ/Fl.pdf" },
       { "name": "Clarinet", "file": "scores/056_ルパン三世のテーマ/BCl.pdf" },
       { "name": "Alto Sax", "file": "scores/056_ルパン三世のテーマ/ASax.pdf" },
@@ -97,6 +93,150 @@
       { "name": "Trombone", "file": "scores/056_ルパン三世のテーマ/Tb.pdf" },
       { "name": "Euphonium", "file": "scores/056_ルパン三世のテーマ/Euph.pdf" },
       { "name": "Tuba", "file": "scores/056_ルパン三世のテーマ/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "057",
+    "number": "No.057",
+    "title": "狙い打ちCmoll",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/057_狙い打ちCmoll/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/057_狙い打ちCmoll/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/057_狙い打ちCmoll/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/057_狙い打ちCmoll/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/057_狙い打ちCmoll/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/057_狙い打ちCmoll/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/057_狙い打ちCmoll/BTp.pdf" },
+      { "name": "Horn", "file": "scores/057_狙い打ちCmoll/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/057_狙い打ちCmoll/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/057_狙い打ちCmoll/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/057_狙い打ちCmoll/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "058",
+    "number": "No.058",
+    "title": "グレイテストショーマン",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/058_グレイテストショーマン/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/058_グレイテストショーマン/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/058_グレイテストショーマン/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/058_グレイテストショーマン/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/058_グレイテストショーマン/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/058_グレイテストショーマン/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/058_グレイテストショーマン/BTp.pdf" },
+      { "name": "Horn", "file": "scores/058_グレイテストショーマン/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/058_グレイテストショーマン/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/058_グレイテストショーマン/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/058_グレイテストショーマン/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "059",
+    "number": "No.059",
+    "title": "紅2026",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/059_紅2026/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/059_紅2026/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/059_紅2026/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/059_紅2026/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/059_紅2026/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/059_紅2026/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/059_紅2026/BTp.pdf" },
+      { "name": "Horn", "file": "scores/059_紅2026/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/059_紅2026/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/059_紅2026/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/059_紅2026/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "060",
+    "number": "No.060",
+    "title": "バンビーナEsdur",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/060_バンビーナEsdur/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/060_バンビーナEsdur/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/060_バンビーナEsdur/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/060_バンビーナEsdur/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/060_バンビーナEsdur/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/060_バンビーナEsdur/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/060_バンビーナEsdur/BTp.pdf" },
+      { "name": "Horn", "file": "scores/060_バンビーナEsdur/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/060_バンビーナEsdur/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/060_バンビーナEsdur/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/060_バンビーナEsdur/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "061",
+    "number": "No.061",
+    "title": "青のプライド",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/061_青のプライド/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/061_青のプライド/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/061_青のプライド/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/061_青のプライド/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/061_青のプライド/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/061_青のプライド/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/061_青のプライド/BTp.pdf" },
+      { "name": "Horn", "file": "scores/061_青のプライド/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/061_青のプライド/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/061_青のプライド/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/061_青のプライド/Tub.pdf" }
+    ]
+  },
+  {
+    "id": "062",
+    "number": "No.062",
+    "title": "2026チャンステーマ　打ち砕け",
+    "composer": "",
+    "arranger": "",
+    "genre": "",
+    "duration": "",
+    "difficulty": "",
+    "notes": "",
+    "fullScore": "scores/062_打ち砕け/Full.pdf",
+    "parts": [
+      { "name": "Flute", "file": "scores/062_打ち砕け/Fl.pdf" },
+      { "name": "Clarinet", "file": "scores/062_打ち砕け/BCl.pdf" },
+      { "name": "Alto Sax", "file": "scores/062_打ち砕け/ASax.pdf" },
+      { "name": "Tenor Sax", "file": "scores/062_打ち砕け/TSax.pdf" },
+      { "name": "Baritone Sax", "file": "scores/062_打ち砕け/BSax.pdf" },
+      { "name": "Trumpet", "file": "scores/062_打ち砕け/BTp.pdf" },
+      { "name": "Horn", "file": "scores/062_打ち砕け/FHr.pdf" },
+      { "name": "Trombone", "file": "scores/062_打ち砕け/Tb.pdf" },
+      { "name": "Euphonium", "file": "scores/062_打ち砕け/Euph.pdf" },
+      { "name": "Tuba", "file": "scores/062_打ち砕け/Tub.pdf" }
     ]
   }
 ]
