@@ -79,6 +79,22 @@
     color: rgba(255,255,255,0.4);
     letter-spacing: 0.1em;
   }
+  .header-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.8);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .header-btn:hover { background: rgba(255,255,255,0.16); color: #fff; border-color: rgba(255,255,255,0.3); }
+  .header-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .header-btn.primary:hover { background: var(--accent-lt); }
 
   /* ─── Layout ─── */
   .layout { display: flex; flex: 1; overflow: hidden; }
@@ -318,6 +334,14 @@
     transition: all 0.14s; flex-shrink: 0; margin-top: 2px;
   }
   .btn-close:hover { border-color: var(--text2); background: var(--bg3); color: var(--text); }
+  .btn-delete-score {
+    background: transparent; border: 1px solid var(--border2); color: var(--text2);
+    border-radius: 6px; width: 32px; height: 32px;
+    cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.14s; flex-shrink: 0; margin-top: 2px;
+  }
+  .btn-delete-score:hover { border-color: var(--danger); background: var(--danger-dim); color: var(--danger); }
 
   .detail-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
   .detail-tabs {
@@ -490,6 +514,44 @@
   .btn-dl:hover { background: var(--accent-dk); box-shadow: var(--shadow-md); }
   .btn-dl:disabled { background: var(--border2); color: var(--text3); cursor: not-allowed; box-shadow: none; }
 
+  /* ─── Register form ─── */
+  .form-row { margin-bottom: 14px; }
+  .form-row-split { display: flex; gap: 12px; margin-bottom: 14px; }
+  .form-row-split > div { flex: 1; }
+  .form-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 6px; display: block;
+  }
+  .form-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 10px; font-family: var(--sans); font-size: 13px; color: var(--text); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  textarea.form-input { resize: vertical; font-family: var(--sans); }
+  input[type="file"].form-input { padding: 6px 8px; font-size: 12px; cursor: pointer; }
+  .part-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .part-row .part-name-input { flex: 1; }
+  .part-row .part-file-input { flex: 1.5; font-size: 12px; }
+  .required-mark { color: var(--danger); }
+
+  /* ─── Folder picker overlay ─── */
+  .picker-overlay {
+    position: fixed; inset: 0; background: var(--bg);
+    z-index: 1000; display: none; align-items: center; justify-content: center;
+  }
+  .picker-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 40px 44px; max-width: 460px; text-align: center; box-shadow: var(--shadow-lg);
+  }
+  .picker-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.5; }
+  .picker-title { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+  .picker-desc { font-size: 13px; color: var(--text2); line-height: 1.8; margin-bottom: 20px; text-align: left; }
+  .picker-desc code {
+    font-family: var(--mono); font-size: 11px; background: var(--bg3);
+    padding: 1px 5px; border-radius: 3px;
+  }
+
   /* ─── Toast ─── */
   .toast {
     position: fixed; bottom: 22px; right: 22px;
@@ -506,12 +568,50 @@
 </head>
 <body>
 
+<!-- ─── フォルダ選択オーバーレイ（起動時に楽譜フォルダへのアクセスを取得） ─── -->
+<div class="picker-overlay" id="picker-overlay">
+  <div class="picker-card">
+    <div class="picker-icon">📁</div>
+
+    <div id="picker-select">
+      <div class="picker-title">楽譜フォルダを選択してください</div>
+      <div class="picker-desc">
+        楽譜データ（各曲のフォルダ・PDF）が入ったフォルダを指定します。<br><br>
+        Google ドライブや Dropbox などで同期しているフォルダを選ぶと、
+        他のパソコンで登録した楽譜も自動的に反映されます。
+      </div>
+      <button class="btn-generate" id="btn-pick-folder" style="width:auto;padding:11px 30px;">フォルダを選択</button>
+    </div>
+
+    <div id="picker-unsupported" style="display:none">
+      <div class="picker-title">対応していないブラウザです</div>
+      <div class="picker-desc">
+        この機能は現在 <b>Chrome</b> または <b>Edge</b> でのみ利用できます。<br>
+        該当のブラウザでこのページを開き直してください。
+      </div>
+    </div>
+
+    <div id="picker-needs-server" style="display:none">
+      <div class="picker-title">このままではフォルダを選択できません</div>
+      <div class="picker-desc">
+        ファイルをダブルクリックして直接開いた場合（<code>file://</code>）、
+        セキュリティ上の理由でフォルダ選択機能が使えません。<br><br>
+        <code>https://</code> で公開されたページ（GitHub Pages など）として開くか、
+        パソコン上でごく簡単なローカルサーバーを起動してから
+        <code>http://localhost/...</code> として開いてください。
+      </div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div>
     <div class="logo"><span class="logo-mark">♩</span>Baseball Library</div>
     <div class="logo-sub">Baseball Score Manager</div>
   </div>
   <div class="header-sep"></div>
+  <button class="header-btn" id="btn-change-folder">📁 フォルダ変更</button>
+  <button class="header-btn primary" id="btn-register-open">＋ 楽譜を登録</button>
   <div class="header-count" id="header-count">— / — scores</div>
 </header>
 
@@ -565,6 +665,7 @@
         <div class="detail-title" id="d-title"></div>
         <div class="detail-subtitle" id="d-subtitle"></div>
       </div>
+      <button class="btn-delete-score" id="btn-delete-score" title="この楽譜を削除">🗑</button>
       <button class="btn-close" id="btn-close-detail">✕</button>
     </div>
     <div class="detail-body">
@@ -629,6 +730,76 @@
   </div>
 </div>
 
+<!-- Register Modal -->
+<div class="modal-overlay" id="register-overlay">
+  <div class="modal" style="width:640px;max-height:86vh">
+    <div class="modal-header">
+      <span class="modal-title">楽譜を登録する</span>
+      <button class="btn-close" id="btn-close-register">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-split">
+        <div style="flex:0.6">
+          <label class="form-label">曲番号（任意）</label>
+          <input type="text" class="form-input" id="reg-number" placeholder="例: 032">
+        </div>
+        <div style="flex:1.4">
+          <label class="form-label">曲名 <span class="required-mark">*</span></label>
+          <input type="text" class="form-input" id="reg-title" placeholder="曲名">
+        </div>
+      </div>
+      <div class="form-row-split">
+        <div>
+          <label class="form-label">作曲者</label>
+          <input type="text" class="form-input" id="reg-composer">
+        </div>
+        <div>
+          <label class="form-label">編曲者</label>
+          <input type="text" class="form-input" id="reg-arranger">
+        </div>
+      </div>
+      <div class="form-row-split">
+        <div>
+          <label class="form-label">ジャンル</label>
+          <input type="text" class="form-input" id="reg-genre">
+        </div>
+        <div>
+          <label class="form-label">演奏時間</label>
+          <input type="text" class="form-input" id="reg-duration" placeholder="例: 4:30">
+        </div>
+        <div>
+          <label class="form-label">難易度</label>
+          <input type="text" class="form-input" id="reg-difficulty">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">メモ</label>
+        <textarea class="form-input" id="reg-notes" rows="2"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">総譜（フルスコア）PDF（任意）</label>
+        <input type="file" accept="application/pdf" class="form-input" id="reg-full-file">
+      </div>
+
+      <div class="form-row">
+        <div class="modal-parts-header" style="margin-bottom:10px">
+          <span class="modal-parts-label">パート譜</span>
+          <button type="button" class="modal-select-all" id="reg-add-part">＋ パートを追加</button>
+        </div>
+        <div id="reg-parts-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-info-wrap">
+        <div class="modal-info-text" id="reg-info-text"></div>
+      </div>
+      <button class="btn-cancel" id="btn-cancel-register">キャンセル</button>
+      <button class="btn-dl" id="btn-save-register">登録する</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -640,25 +811,160 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 let allScores = [], filteredScores = [], queue = [];
 let activeScore = null;
-let pdfDoc = null, pdfPage = 1, pdfTotal = 0, pdfScale = 1.2, currentPdfUrl = null;
+let pdfDoc = null, pdfPage = 1, pdfTotal = 0, pdfScale = 1.2, currentPdfKey = null;
+let rootDirHandle = null; // 楽譜データフォルダの DirectoryHandle
 
-// ─── Load ───
-async function loadScores() {
-  try {
-    const res = await fetch('data/scores.json');
-    allScores = await res.json();
-    filteredScores = [...allScores];
-    renderTable();
-    updateHeaderCount();
-  } catch { showToast('scores.json の読み込みに失敗しました', 'error'); }
+/* ============================================================
+   IndexedDB: フォルダの DirectoryHandle を保存し、次回以降は
+   フォルダ選択をやり直さなくて済むようにする
+   ============================================================ */
+const IDB_NAME = 'score-library-db';
+const IDB_STORE = 'handles';
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbSet(key, val) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbGet(key) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
 }
 
-// ─── Table ───
+/* ============================================================
+   フォルダアクセス許可まわり
+   ============================================================ */
+async function verifyPermission(handle, mode = 'readwrite') {
+  const opts = { mode };
+  try {
+    if ((await handle.queryPermission(opts)) === 'granted') return true;
+    if ((await handle.requestPermission(opts)) === 'granted') return true;
+  } catch { /* ignore */ }
+  return false;
+}
+
+function showPickerScreen(state) {
+  document.getElementById('picker-overlay').style.display = 'flex';
+  document.getElementById('picker-select').style.display = state === 'select' ? 'block' : 'none';
+  document.getElementById('picker-unsupported').style.display = state === 'unsupported' ? 'block' : 'none';
+  document.getElementById('picker-needs-server').style.display = state === 'needs-server' ? 'block' : 'none';
+}
+function hidePickerScreen() {
+  document.getElementById('picker-overlay').style.display = 'none';
+}
+
+async function initFolder() {
+  if (!window.showDirectoryPicker) { showPickerScreen('unsupported'); return; }
+  if (location.protocol === 'file:') { showPickerScreen('needs-server'); return; }
+  try {
+    const saved = await idbGet('scoresDir');
+    if (saved && (await verifyPermission(saved))) {
+      rootDirHandle = saved;
+      hidePickerScreen();
+      await loadScores();
+      return;
+    }
+  } catch (e) { console.warn(e); }
+  showPickerScreen('select');
+}
+
+async function pickFolder() {
+  const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+  rootDirHandle = handle;
+  await idbSet('scoresDir', handle);
+  return handle;
+}
+
+document.getElementById('btn-pick-folder').addEventListener('click', async () => {
+  try {
+    await pickFolder();
+    hidePickerScreen();
+    await loadScores();
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    showToast('フォルダの選択に失敗しました', 'error');
+  }
+});
+
+document.getElementById('btn-change-folder').addEventListener('click', async () => {
+  try {
+    await pickFolder();
+    await loadScores();
+    showToast('フォルダを切り替えました', 'success');
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    showToast('フォルダの選択に失敗しました', 'error');
+  }
+});
+
+/* ============================================================
+   楽譜データの読み込み
+   フォルダ構成:
+     <選択したフォルダ>/
+       <score-id>/
+         meta.json
+         full.pdf        (任意)
+         parts/
+           <filename>.pdf
+   ============================================================ */
+async function loadScores() {
+  allScores = [];
+  try {
+    for await (const [name, handle] of rootDirHandle.entries()) {
+      if (handle.kind !== 'directory') continue;
+      try {
+        const metaFile = await (await handle.getFileHandle('meta.json')).getFile();
+        const meta = JSON.parse(await metaFile.text());
+        meta.id = name;
+        meta.dirHandle = handle;
+        meta.parts = meta.parts || [];
+        allScores.push(meta);
+      } catch (e) {
+        console.warn(`スキップ（meta.json が読めません）: ${name}`, e);
+      }
+    }
+  } catch (e) {
+    console.error(e);
+    if (e.name === 'NotAllowedError') {
+      showToast('フォルダへのアクセス権限が切れました。再度選択してください', 'error');
+      showPickerScreen('select');
+      return;
+    }
+    showToast('楽譜フォルダの読み込みに失敗しました', 'error');
+  }
+  allScores.sort((a, b) =>
+    (a.number || '').localeCompare(b.number || '', 'ja', { numeric: true }) ||
+    (a.title || '').localeCompare(b.title || '', 'ja')
+  );
+  filteredScores = [...allScores];
+  queue = queue.filter(q => allScores.some(s => s.id === q.id));
+  renderTable();
+  renderQueue();
+  updateHeaderCount();
+}
+
+/* ─── Table ─── */
 function renderTable() {
   const term = document.getElementById('search-input').value.toLowerCase();
   filteredScores = allScores.filter(s =>
-    !term || s.title.toLowerCase().includes(term) ||
-    s.composer.toLowerCase().includes(term) ||
+    !term || (s.title || '').toLowerCase().includes(term) ||
+    (s.composer || '').toLowerCase().includes(term) ||
     (s.arranger && s.arranger.toLowerCase().includes(term))
   );
   const tbody = document.getElementById('score-tbody');
@@ -670,10 +976,10 @@ function renderTable() {
     if (inQ) tr.classList.add('in-queue');
     if (isAct) tr.classList.add('active');
     tr.innerHTML = `
-      <td class="col-num">${score.number}</td>
+      <td class="col-num">${score.number || ''}</td>
       <td class="col-title"><span class="in-queue-dot"></span>${score.title}</td>
-      <td class="col-composer">${score.composer}${score.arranger ? ` <span style="color:var(--text3);font-size:11px">arr. ${score.arranger}</span>` : ''}</td>
-      <td><span class="genre-badge">${score.genre}</span></td>
+      <td class="col-composer">${score.composer || ''}${score.arranger ? ` <span style="color:var(--text3);font-size:11px">arr. ${score.arranger}</span>` : ''}</td>
+      <td><span class="genre-badge">${score.genre || '—'}</span></td>
       <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${score.parts.length}</td>
       <td class="col-actions">
         <button class="btn-add ${inQ ? 'added' : ''}" data-id="${score.id}">${inQ ? '✓' : '+'}</button>
@@ -689,7 +995,7 @@ function updateHeaderCount() {
   document.getElementById('header-count').textContent = `${filteredScores.length} / ${allScores.length} scores`;
 }
 
-// ─── Queue ───
+/* ─── Queue ─── */
 function toggleQueue(id) {
   const score = allScores.find(s => s.id === id);
   if (!score) return;
@@ -707,7 +1013,7 @@ function renderQueue() {
   }
   el.innerHTML = queue.map((q, i) => `
     <div class="queue-item" data-idx="${i}">
-      <div class="queue-item-num">${q.score.number}</div>
+      <div class="queue-item-num">${q.score.number || ''}</div>
       <div class="queue-item-title">${q.score.title}</div>
       <button class="queue-item-remove" data-id="${q.id}">✕</button>
     </div>
@@ -718,11 +1024,11 @@ function renderQueue() {
     item.addEventListener('click', () => { const s = queue[+item.dataset.idx]?.score; if (s) openDetail(s); }));
 }
 
-// ─── Detail ───
+/* ─── Detail ─── */
 function openDetail(score) {
   activeScore = score;
   renderTable();
-  document.getElementById('d-num').textContent = score.number;
+  document.getElementById('d-num').textContent = score.number || '';
   document.getElementById('d-title').textContent = score.title;
   document.getElementById('d-subtitle').textContent =
     [score.composer, score.arranger ? `arr. ${score.arranger}` : ''].filter(Boolean).join(' / ');
@@ -731,16 +1037,18 @@ function openDetail(score) {
   document.getElementById('info-grid').innerHTML =
     fields.map(([l, v]) => `<div class="info-item"><div class="info-label">${l}</div><div class="info-value">${v||'—'}</div></div>`).join('') +
     (score.notes ? `<div class="info-item info-full info-notes"><div class="info-label">メモ</div><div class="info-value">${score.notes}</div></div>` : '') +
-    `<div class="info-item info-full" style="border-bottom:none"><div class="info-label">パート一覧</div><div class="parts-wrap">${score.parts.map(p=>`<span class="part-chip"><span class="part-chip-dot"></span>${p.name}</span>`).join('')}</div></div>`;
+    `<div class="info-item info-full" style="border-bottom:none"><div class="info-label">パート一覧</div><div class="parts-wrap">${score.parts.map(p=>`<span class="part-chip"><span class="part-chip-dot"></span>${p.name}</span>`).join('') || '<span style="color:var(--text3);font-size:12px">なし</span>'}</div></div>`;
 
   const sel = document.getElementById('pdf-part-select');
-  sel.innerHTML = `<option value="full">スコア（総譜）</option>` + score.parts.map(p => `<option value="${p.file}">${p.name}</option>`).join('');
-  sel.value = 'full';
+  sel.innerHTML = (score.hasFullScore ? `<option value="__full__">スコア（総譜）</option>` : '') +
+    score.parts.map(p => `<option value="${p.filename}">${p.name}</option>`).join('');
+  sel.value = score.hasFullScore ? '__full__' : (score.parts[0] ? score.parts[0].filename : '');
 
   switchTab('info');
-  pdfPage = 1; pdfScale = 1.2; currentPdfUrl = null;
+  pdfPage = 1; pdfScale = 1.2; currentPdfKey = null;
   document.getElementById('pdf-canvas').style.display = 'none';
   document.getElementById('pdf-no-file').style.display = 'flex';
+  document.getElementById('pdf-no-file').innerHTML = '<span style="font-size:34px;opacity:0.22">📄</span>PDFファイルが設定されていません';
   document.getElementById('detail-overlay').classList.add('open');
 }
 function closeDetail() {
@@ -751,6 +1059,20 @@ function closeDetail() {
 document.getElementById('btn-close-detail').addEventListener('click', closeDetail);
 document.getElementById('detail-backdrop').addEventListener('click', closeDetail);
 
+document.getElementById('btn-delete-score').addEventListener('click', async () => {
+  if (!activeScore) return;
+  if (!confirm(`「${activeScore.title}」を削除しますか？\nこの操作は取り消せません。`)) return;
+  try {
+    await rootDirHandle.removeEntry(activeScore.id, { recursive: true });
+    showToast('削除しました', 'success');
+    closeDetail();
+    await loadScores();
+  } catch (e) {
+    console.error(e);
+    showToast('削除に失敗しました', 'error');
+  }
+});
+
 function switchTab(name) {
   document.querySelectorAll('.detail-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${name}`));
@@ -758,24 +1080,43 @@ function switchTab(name) {
 document.querySelectorAll('.detail-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     switchTab(tab.dataset.tab);
-    if (tab.dataset.tab === 'pdf' && activeScore && !currentPdfUrl) loadPdf(activeScore.fullScore || null);
+    if (tab.dataset.tab === 'pdf' && activeScore && !currentPdfKey) {
+      loadPdf(activeScore, document.getElementById('pdf-part-select').value);
+    }
   });
 });
 
-// ─── PDF Viewer ───
-async function loadPdf(url) {
-  if (!url) { document.getElementById('pdf-canvas').style.display='none'; document.getElementById('pdf-no-file').style.display='flex'; return; }
-  document.getElementById('pdf-no-file').innerHTML = '<div class="pdf-loading">読み込み中...</div>';
-  document.getElementById('pdf-no-file').style.display = 'flex';
-  document.getElementById('pdf-canvas').style.display = 'none';
+/* ─── PDF Viewer ─── */
+async function loadPdf(score, key) {
+  const canvas = document.getElementById('pdf-canvas');
+  const noFileEl = document.getElementById('pdf-no-file');
+  if (!key) {
+    canvas.style.display = 'none';
+    noFileEl.style.display = 'flex';
+    noFileEl.innerHTML = '<span style="font-size:34px;opacity:0.22">📄</span>PDFファイルが設定されていません';
+    return;
+  }
+  noFileEl.innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+  noFileEl.style.display = 'flex';
+  canvas.style.display = 'none';
   try {
     if (pdfDoc) { pdfDoc.destroy(); pdfDoc = null; }
-    pdfDoc = await pdfjsLib.getDocument(url).promise;
-    pdfTotal = pdfDoc.numPages; pdfPage = 1; currentPdfUrl = url;
+    let fileHandle;
+    if (key === '__full__') {
+      fileHandle = await score.dirHandle.getFileHandle('full.pdf');
+    } else {
+      const partsDir = await score.dirHandle.getDirectoryHandle('parts');
+      fileHandle = await partsDir.getFileHandle(key);
+    }
+    const file = await fileHandle.getFile();
+    const buf = await file.arrayBuffer();
+    pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+    pdfTotal = pdfDoc.numPages; pdfPage = 1; currentPdfKey = key;
     renderPdfPage();
-  } catch {
-    document.getElementById('pdf-no-file').innerHTML =
-      `<span style="font-size:28px;opacity:0.22">⚠</span><span style="color:var(--danger)">PDFを読み込めませんでした</span><span style="font-size:11px;color:var(--text3)">${url}</span>`;
+  } catch (e) {
+    console.error(e);
+    noFileEl.innerHTML =
+      `<span style="font-size:28px;opacity:0.22">⚠</span><span style="color:var(--danger)">PDFを読み込めませんでした</span>`;
   }
 }
 async function renderPdfPage() {
@@ -791,32 +1132,30 @@ async function renderPdfPage() {
 }
 document.getElementById('pdf-part-select').addEventListener('change', e => {
   if (!activeScore) return;
-  const v = e.target.value; loadPdf(v === 'full' ? activeScore.fullScore : v);
+  loadPdf(activeScore, e.target.value);
 });
 document.getElementById('pdf-prev').addEventListener('click', () => { if(pdfPage>1){pdfPage--;renderPdfPage();} });
 document.getElementById('pdf-next').addEventListener('click', () => { if(pdfPage<pdfTotal){pdfPage++;renderPdfPage();} });
 document.getElementById('pdf-zoom-in').addEventListener('click', () => { pdfScale=Math.min(pdfScale+0.2,3.0);renderPdfPage(); });
 document.getElementById('pdf-zoom-out').addEventListener('click', () => { pdfScale=Math.max(pdfScale-0.2,0.4);renderPdfPage(); });
 
-// ─── Modal: 全曲まとめてパート選択 ───
+/* ─── Modal: 全曲まとめてパート選択 ─── */
 function buildPartMap() {
-  // partName -> [{ score, file }]
+  // partName -> [{ score, file(=filename) }]
   const map = new Map();
   queue.forEach(({ score }) => {
     score.parts.forEach(p => {
       if (!map.has(p.name)) map.set(p.name, []);
-      map.get(p.name).push({ score, file: p.file });
+      map.get(p.name).push({ score, file: p.filename });
     });
   });
   return map;
 }
 
 function openModal() {
-  // キューサマリー（モーダル上部）
   document.getElementById('modal-queue-summary').innerHTML =
-    queue.map(q => `<span class="modal-queue-chip"><span class="modal-queue-chip-num">${q.score.number}</span>${q.score.title}</span>`).join('');
+    queue.map(q => `<span class="modal-queue-chip"><span class="modal-queue-chip-num">${q.score.number||''}</span>${q.score.title}</span>`).join('');
 
-  // パートグリッド（全曲横断・パート名で統合）
   const partMap = buildPartMap();
   const grid = document.getElementById('modal-parts-grid');
   grid.innerHTML = '';
@@ -852,11 +1191,17 @@ document.getElementById('btn-generate').addEventListener('click', openModal);
 document.getElementById('btn-close-modal').addEventListener('click', closeModal);
 document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
 
-// ─── Download（パートごと個別PDF → ZIPまとめ）───
+async function getPartBytes(score, filename) {
+  const partsDir = await score.dirHandle.getDirectoryHandle('parts');
+  const fh = await partsDir.getFileHandle(filename);
+  const file = await fh.getFile();
+  return await file.arrayBuffer();
+}
+
+/* ─── Download（パートごと個別PDF → ZIPまとめ）─── */
 document.getElementById('btn-download').addEventListener('click', async () => {
   const partMap = buildPartMap();
 
-  // 選択パートを収集: { partName, items:[{score,file}] }[]
   const selectedParts = [];
   document.querySelectorAll('#modal-parts-grid .part-check-label.checked').forEach(lbl => {
     const pn = lbl.dataset.part;
@@ -878,11 +1223,10 @@ document.getElementById('btn-download').addEventListener('click', async () => {
         `処理中: ${partName} (${i + 1} / ${total})`;
       document.getElementById('progress-bar').style.width = `${((i + 1) / total) * 100}%`;
 
-      // パート1つにつき1つのPDFを生成（複数曲あればページを結合）
       const partPdf = await PDFDocument.create();
       for (const { score, file } of items) {
         try {
-          const bytes = await fetch(file).then(r => r.arrayBuffer());
+          const bytes = await getPartBytes(score, file);
           const src = await PDFDocument.load(bytes);
           const pages = await partPdf.copyPages(src, src.getPageIndices());
           pages.forEach(p => partPdf.addPage(p));
@@ -892,8 +1236,6 @@ document.getElementById('btn-download').addEventListener('click', async () => {
       }
 
       const pdfBytes = await partPdf.save();
-
-      // ファイル名: パート名をそのまま使用（記号を安全な文字に変換）
       const safeName = partName.replace(/[\\/:*?"<>|]/g, '_');
       zip.file(`${safeName}.pdf`, pdfBytes);
     }
@@ -920,7 +1262,144 @@ document.getElementById('btn-download').addEventListener('click', async () => {
   document.getElementById('progress-wrap').style.display = 'none';
 });
 
-// ─── Search & Toast ───
+/* ============================================================
+   登録（新規楽譜の追加）
+   フォルダ名は crypto.randomUUID() で採番するため、
+   複数のパソコンから同時に登録してもフォルダ名が衝突しない。
+   ============================================================ */
+let regPartRows = 0;
+
+function openRegisterModal() {
+  document.getElementById('reg-number').value = '';
+  document.getElementById('reg-title').value = '';
+  document.getElementById('reg-composer').value = '';
+  document.getElementById('reg-arranger').value = '';
+  document.getElementById('reg-genre').value = '';
+  document.getElementById('reg-duration').value = '';
+  document.getElementById('reg-difficulty').value = '';
+  document.getElementById('reg-notes').value = '';
+  document.getElementById('reg-full-file').value = '';
+  document.getElementById('reg-parts-list').innerHTML = '';
+  document.getElementById('reg-info-text').textContent = '';
+  regPartRows = 0;
+  addPartRow();
+  document.getElementById('register-overlay').classList.add('open');
+}
+function closeRegisterModal() { document.getElementById('register-overlay').classList.remove('open'); }
+
+function addPartRow(defaultName = '') {
+  const idx = regPartRows++;
+  const wrap = document.createElement('div');
+  wrap.className = 'part-row';
+  wrap.dataset.idx = idx;
+  wrap.innerHTML = `
+    <input type="text" class="form-input part-name-input" placeholder="パート名（例: Trumpet 1）" value="${defaultName}">
+    <input type="file" accept="application/pdf" class="form-input part-file-input">
+    <button type="button" class="queue-item-remove part-remove-btn" title="この行を削除">✕</button>
+  `;
+  wrap.querySelector('.part-remove-btn').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('.part-file-input').addEventListener('change', e => {
+    const nameInput = wrap.querySelector('.part-name-input');
+    if (!nameInput.value && e.target.files[0]) {
+      nameInput.value = e.target.files[0].name.replace(/\.pdf$/i, '');
+    }
+  });
+  document.getElementById('reg-parts-list').appendChild(wrap);
+}
+
+document.getElementById('reg-add-part').addEventListener('click', () => addPartRow());
+document.getElementById('btn-register-open').addEventListener('click', () => {
+  if (!rootDirHandle) { showToast('先にフォルダを選択してください', 'error'); return; }
+  openRegisterModal();
+});
+document.getElementById('btn-close-register').addEventListener('click', closeRegisterModal);
+document.getElementById('btn-cancel-register').addEventListener('click', closeRegisterModal);
+
+function sanitizeFilename(name) {
+  return (name || '').trim().replace(/[\\/:*?"<>|]/g, '_') || 'part';
+}
+
+document.getElementById('btn-save-register').addEventListener('click', async () => {
+  const title = document.getElementById('reg-title').value.trim();
+  if (!title) { showToast('曲名を入力してください', 'error'); return; }
+  if (!rootDirHandle) { showToast('楽譜フォルダが選択されていません', 'error'); return; }
+
+  const partRows = [...document.querySelectorAll('#reg-parts-list .part-row')]
+    .map(row => ({
+      name: row.querySelector('.part-name-input').value.trim(),
+      file: row.querySelector('.part-file-input').files[0] || null
+    }))
+    .filter(p => p.name && p.file);
+
+  const fullFile = document.getElementById('reg-full-file').files[0] || null;
+  if (!fullFile && partRows.length === 0) {
+    showToast('総譜またはパート譜を1つ以上指定してください', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-register');
+  btn.disabled = true;
+  document.getElementById('reg-info-text').textContent = '登録中...';
+
+  try {
+    const id = (self.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `score-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const scoreDir = await rootDirHandle.getDirectoryHandle(id, { create: true });
+
+    const meta = {
+      number: document.getElementById('reg-number').value.trim(),
+      title,
+      composer: document.getElementById('reg-composer').value.trim(),
+      arranger: document.getElementById('reg-arranger').value.trim(),
+      genre: document.getElementById('reg-genre').value.trim(),
+      duration: document.getElementById('reg-duration').value.trim(),
+      difficulty: document.getElementById('reg-difficulty').value.trim(),
+      notes: document.getElementById('reg-notes').value.trim(),
+      hasFullScore: !!fullFile,
+      parts: []
+    };
+
+    if (fullFile) {
+      const fh = await scoreDir.getFileHandle('full.pdf', { create: true });
+      const w = await fh.createWritable();
+      await w.write(fullFile);
+      await w.close();
+    }
+
+    if (partRows.length > 0) {
+      const partsDir = await scoreDir.getDirectoryHandle('parts', { create: true });
+      const usedNames = new Set();
+      for (const p of partRows) {
+        const base = sanitizeFilename(p.name);
+        let filename = `${base}.pdf`;
+        let n = 1;
+        while (usedNames.has(filename)) { filename = `${base}_${++n}.pdf`; }
+        usedNames.add(filename);
+        const fh = await partsDir.getFileHandle(filename, { create: true });
+        const w = await fh.createWritable();
+        await w.write(p.file);
+        await w.close();
+        meta.parts.push({ name: p.name, filename });
+      }
+    }
+
+    const metaHandle = await scoreDir.getFileHandle('meta.json', { create: true });
+    const mw = await metaHandle.createWritable();
+    await mw.write(JSON.stringify(meta, null, 2));
+    await mw.close();
+
+    showToast(`「${title}」を登録しました`, 'success');
+    closeRegisterModal();
+    await loadScores();
+  } catch (e) {
+    console.error(e);
+    showToast('登録中にエラーが発生しました', 'error');
+  }
+  btn.disabled = false;
+});
+
+/* ─── Search & Toast ─── */
 document.getElementById('search-input').addEventListener('input', renderTable);
 
 let toastTimer;
@@ -931,7 +1410,7 @@ function showToast(msg, type = '') {
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-loadScores();
+initFolder();
 </script>
 </body>
 </html>
