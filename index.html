@@ -868,7 +868,12 @@ const CONFIG = {
   // 楽譜データを保存する Google ドライブのフォルダID
   // （フォルダをブラウザで開いたときのURL末尾の文字列）
   ROOT_FOLDER_ID: '1Wai1f086ITiI7dg1SgyjKHbjUyUrtbQ1',
-  SCOPE: 'https://www.googleapis.com/auth/drive.file'
+  // アクセス権限（スコープ）。
+  // 以前の 'drive.file' は「自分がこのアプリで作成したファイル」しか
+  // 見られないため、別の人が登録した楽譜が他のアカウントから見えず
+  // 0件になる問題がありました。共有フォルダの中身を誰が作ったかに
+  // 関わらず全員が読み書きできるよう 'drive' に変更しています。
+  SCOPE: 'https://www.googleapis.com/auth/drive'
 };
 /* ============================================================
    ▲▲▲ 設定はここまで ▲▲▲
