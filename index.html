@@ -850,7 +850,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://accounts.google.com/gsi/client" async defer onload="initAuth()"></script>
+<script id="gsi-script" src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1787,6 +1787,28 @@ function showToast(msg, type = '') {
 }
 
 if (!isConfigured()) showAuthScreen('unconfigured');
+
+/* ============================================================
+   Google Identity Services(GSI)の読み込み待ち
+   以前は <script onload="initAuth()"> で呼び出していましたが、
+   GSIスクリプトがブラウザにキャッシュされていると、このメイン
+   スクリプトより先に onload が発火してしまい、
+   「initAuth is not defined」エラーになることがありました。
+   ここでは、GSIが既に読み込み済みなら即座に、まだなら読み込み完了を
+   待ってから initAuth() を呼ぶようにして、タイミングに関わらず
+   確実に動作するようにしています。
+   ============================================================ */
+(function initAuthWhenReady() {
+  if (window.google && google.accounts && google.accounts.oauth2) {
+    initAuth();
+    return;
+  }
+  const gsiScriptEl = document.getElementById('gsi-script');
+  if (gsiScriptEl) {
+    gsiScriptEl.addEventListener('load', initAuth);
+    gsiScriptEl.addEventListener('error', () => showAuthScreen('error'));
+  }
+})();
 </script>
 </body>
 </html>
